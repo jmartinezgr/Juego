@@ -2,6 +2,7 @@ from random import choice, randint #Importar librerias
 import json
 from datetime import datetime
 
+#Actualizar informacion dentro del json
 def update_data(winner,loser):
     with open("scores.json","r") as f:
         data = json.loads(f.read())
@@ -26,6 +27,7 @@ def update_data(winner,loser):
     with open("scores.json","w") as f:
         f.write(json.dumps(data))
 
+#Obtener informacion del json y mostrarla
 def show_data():
     with open("scores.json","r") as f:
         data = json.loads(f.read())
