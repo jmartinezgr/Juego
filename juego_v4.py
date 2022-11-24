@@ -1,4 +1,51 @@
 from random import choice, randint #Importar librerias
+import json
+from datetime import datetime
+
+def update_data(winner,loser):
+    with open("scores.json","r") as f:
+        data = json.loads(f.read())
+
+    if not(data.get(winner)):
+        data[winner] = {
+            'points': 1,
+            'last_game' :  datetime.now().strftime('%Y-%m-%d a las %H:%M')
+        }
+    else:
+        data[winner]['points']+=1
+        data[winner]['last_game'] =  datetime.now().strftime('%Y-%m-%d a las %H:%M')    
+
+    if not(data.get(loser)):
+        data[loser] = {
+            'points':0,
+            'last_game': datetime.now().strftime('%Y-%m-%d a las %H:%M')
+        }
+    else:
+        data[loser]['last_game'] = datetime.now().strftime('%Y-%m-%d a las %H:%M')
+
+    with open("scores.json","w") as f:
+        f.write(json.dumps(data))
+
+def show_data():
+    with open("scores.json","r") as f:
+        data = json.loads(f.read())
+
+    ordered_list = list(data.keys())
+
+    for i in range(len(ordered_list)):
+        for j in range(len(ordered_list)-1):
+            if data[ordered_list[j]]['points'] < data[ordered_list[j+1]]['points']:
+                ordered_list[j], ordered_list[j+1] = ordered_list[j+1], ordered_list[j]
+
+
+    cont = 0
+    print("\n*** TABLA DE POSICIONES ***\n")
+    for i in ordered_list:
+        cont += 1
+        info = data[i]['points']
+        hour = data[i]['last_game'] 
+        print(f'{cont}. {i} {info} puntos acumulados. Ultima partida en {hour}')
+    print()
 
 #Funcion para comprobar si el tablero esta lleno
 def full():
@@ -239,7 +286,10 @@ while True:
     print(get_table(tablero))
     if column_input(tablero,turno)=="victoria": #Llamar a la funcion de recibir columna y comprobar si la nueva ficha da victoria
         print(get_table(tablero)) #Si da victoria imprimos el tablero y preguntamos si desean repetir la partida
-        print(f"¡Felicidades, {turno[0]}, has ganado la partida!")
+        print(f"¡Felicidades, {turno[0]}, has ganado la partida! Se sumara un punto(1) a tu marcador")
+        loser = p1[0] if turno[0] == p2[0] else p2[0]
+        update_data(turno[0],loser=loser)
+        show_data()
         if input("¿Desean volver a tomar la partida Si [S] No [N]?:") == "N":
             break
         else:
